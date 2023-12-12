@@ -3,40 +3,30 @@ import Header from "../components/Header"
 import Sidebar from "../components/SideBar"
 import { BsFillPlusSquareFill } from 'react-icons/bs'
 import Modal from 'react-modal'
-import * as yup from 'yup'
-import { useFormik } from "formik"
 import { IoIosArrowForward } from 'react-icons/io'
 import { toast } from "react-toastify"
 import { axiosAPI } from "../api/axiosAPI"
 export default function Services() {
     const [isOpenFlag, setOpen] = useState(false)
-    const SchemaValidation = yup.object().shape({
-        file: yup.mixed().required()
-    })
-    const Values = { file: null }
-    const formik = useFormik({
-        validationSchema: SchemaValidation,
-        initialValues: Values,
-        onSubmit: async () => {
-            try {
-                await axiosAPI.post('/services/postOrder', Values)
-                console.log(Values)
-                toast.success('Votre Commande est bien envoyée')
-            } catch (error) {
-                console.log('hello')
-                toast.error("Votre Commande n'est pas envoyée")
-            }
-        },
-    })
+    const [FormData, setData] = useState<File | undefined>(undefined)
+    const handleSubmit = async (e: { preventDefault: () => void }) => {
+        e.preventDefault()
+        try {
+            await axiosAPI.post('/postOrder', FormData)
+            toast.success('Good')
+        } catch (error) {
+            toast.error('Bad')
+        }
+    }
     return <>
         <div>
             <Header />
             <Modal isOpen={isOpenFlag}>
-                <div>
-                    <form onSubmit={formik.handleSubmit}>
-                        <div className=" flex gap-5 mb-6">
+                <div className=" p-28">
+                    <form onSubmit={handleSubmit} className="flex flex-col justify-center items-center">
+                        <div className=" flex flex-col items-center gap-5 mb-6 text-2xl font-extrabold">
                             <label>Téléchargez Cahier de Charge</label>
-                            <input type="file" name="file" onChange={formik.handleChange}></input>
+                            <input type="file" name="file" onChange={(e) => setData(e.currentTarget.files?.[0])}></input>
                         </div>
                         <button className=" bg-blue-500 rounded-2xl p-2 font-bold hover:bg-orange-400 text-white hover:duration-300 flex items-center hover:gap-6" type="submit">Commandez<IoIosArrowForward /></button>
                     </form>
