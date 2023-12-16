@@ -1,17 +1,22 @@
 import { useNavigate } from "react-router-dom"
 import { axiosAPI } from "../api/axiosAPI"
 import { toast } from "react-toastify"
+import { useAuth } from "../components/AuthContext";
 export default function Login() {
     const Navigate = useNavigate()
+    const navigate = useNavigate();
+    const { login } = useAuth();
+
     const handleSubmit = async () => {
         try {
-            const data = await axiosAPI.get('/login')
-            document.cookie = `access-token=${data.headers?.Authorization}`
-            Navigate('/services')
+            const data = await axiosAPI.get('/login');
+            login();
+            document.cookie = `access-token=${data.headers?.Authorization}`;
+            navigate('/services');
         } catch (error) {
-            toast.error("error")
+            toast.error('error');
         }
-    }
+    };
     return <>
         <section className="bg-gray-50 dark:bg-gray-900">
             <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
