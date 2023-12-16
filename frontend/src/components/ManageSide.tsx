@@ -21,7 +21,7 @@ export default function ManagementSide() {
             title: 'Les Comptes'
         },
         {
-            link: '/manager/analytics',
+            link: '/analytics',
             icons: <IoMdAnalytics />,
             title: 'Statistics'
         }

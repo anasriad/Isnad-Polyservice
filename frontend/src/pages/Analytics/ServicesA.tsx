@@ -1,6 +1,22 @@
 import { Pie, PieChart, RadialBarChart, RadialBar, Tooltip, Legend, BarChart, CartesianGrid, YAxis, XAxis, Bar } from 'recharts'
 import StatsSide from '../../components/StatsSide'
+import { useEffect, useState } from 'react'
+import { axiosAPI } from '../../api/axiosAPI'
+import { toast } from 'react-toastify'
 export default function ServiceAnalytics() {
+    const [Data, setData] = useState()
+    useEffect(() => {
+        async function getStatistics() {
+            try {
+                const { data } = await axiosAPI.get('/getServiceStats')
+                setData(data)
+                toast.success('Services Statistcs')
+            } catch (error) {
+                toast.error('Erreur')
+            }
+        }
+        getStatistics()
+    })
     const data1 = [{ name: 'service1', value: 89 }, { name: 'service2', value: 20 }, { name: 'service3', value: 100 }]
     return <>
         <div className=' flex justify-between'>

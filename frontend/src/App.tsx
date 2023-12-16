@@ -7,19 +7,23 @@ import Contacts from "./pages/Contacts"
 import ServiceAnalytics from "./pages/Analytics/ServicesA"
 import Sales from "./pages/Analytics/Sales"
 import ServicesManagement from "./pages/Management/OrderManage"
+import Accounts from "./pages/Management/Accounts"
 function App() {
   return (
     <>
       <BrowserRouter>
         <Routes>
+          {/*public routes */}
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signUp" element={<Signup />} />
           <Route path="/services" element={<Services />} />
           <Route path="/contacts" element={<Contacts />} />
+          {/*private routes */}
           <Route path="/manager">
             <Route index element={<Navigate to='/manager/services' />} />
             <Route path="services" element={<ServicesManagement />} />
+            <Route path="accounts" element={<Accounts />} />
           </Route>
           <Route path="/analytics">
             <Route index element={<Navigate to='/analytics/services' />} />

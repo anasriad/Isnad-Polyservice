@@ -1,11 +1,19 @@
 import { useNavigate } from "react-router-dom"
 import { axiosAPI } from "../api/axiosAPI"
 import { toast } from "react-toastify"
+import { Formik, Field, ErrorMessage } from "formik"
+import * as yup from 'yup'
 export default function Login() {
     const Navigate = useNavigate()
+    const InitialValues = { email: "", password: "" }
+    const Validation = yup.object().shape({
+        email: yup.string().email().required('Email is Required'),
+        password: yup.string().min(2, 'Too Short!')
+            .max(70, 'Too Long!').required('Password is Required')
+    })
     const handleSubmit = async () => {
         try {
-            const data = await axiosAPI.get('/login')
+            const data = await axiosAPI.post('/login', InitialValues)
             document.cookie = `access-token=${data.headers?.Authorization}`
             Navigate('/services')
         } catch (error) {
@@ -23,31 +31,35 @@ export default function Login() {
                         <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                             Connectez-vous
                         </h1>
-                        <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
-                            <div>
-                                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
-                                <input type="email" name="email" id="email" className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="name@company.com" required />
-                            </div>
-                            <div>
-                                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Mot de Passe</label>
-                                <input type="password" name="password" id="password" placeholder="••••••••" className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-start">
-                                    <div className="flex items-center h-5">
-                                        <input id="remember" aria-describedby="remember" type="checkbox" className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800" required />
-                                    </div>
-                                    <div className="ml-3 text-sm">
-                                        <label className="text-gray-500 dark:text-gray-300">Remember me</label>
-                                    </div>
+                        <Formik onSubmit={handleSubmit} initialValues={InitialValues} validationSchema={Validation}>
+                            <div className="space-y-4 md:space-y-6">
+                                <div>
+                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
+                                    <Field type="email" name="email" id="email" className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="name@company.com" required />
+                                    <ErrorMessage name="email" className=" text-red-600 text-sm" />
                                 </div>
-                                <a href="#" className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500">Mot de passe oublié?</a>
+                                <div>
+                                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Mot de Passe</label>
+                                    <Field type="password" name="password" id="password" placeholder="••••••••" className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
+                                    <ErrorMessage name="password" className=" text-red-600 text-sm" />
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-start">
+                                        <div className="flex items-center h-5">
+                                            <input id="remember" aria-describedby="remember" type="checkbox" className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800" required />
+                                        </div>
+                                        <div className="ml-3 text-sm">
+                                            <label className="text-gray-500 dark:text-gray-300">Remember me</label>
+                                        </div>
+                                    </div>
+                                    <a href="#" className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500">Mot de passe oublié?</a>
+                                </div>
+                                <button type="submit" className="w-full bg-blue-500 hover:bg-blue-300 hover:text-black text-white hover:duration-300 bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Connectez</button>
+                                <p className="text-sm font-light text-gray-500 dark:text-gray-400">
+                                    Vous n'avez pas un compte? <a href="#" className="font-medium text-primary-600 hover:underline dark:text-primary-500" onClick={() => Navigate('/signUp')}>S'inscrire</a>
+                                </p>
                             </div>
-                            <button type="submit" className="w-full bg-blue-500 hover:bg-blue-300 hover:text-black text-white hover:duration-300 bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Connectez</button>
-                            <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                                Vous n'avez pas un compte? <a href="#" className="font-medium text-primary-600 hover:underline dark:text-primary-500" onClick={() => Navigate('/signUp')}>S'inscrire</a>
-                            </p>
-                        </form>
+                        </Formik>
                     </div>
                 </div>
             </div>
