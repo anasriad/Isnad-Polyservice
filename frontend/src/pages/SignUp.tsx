@@ -1,42 +1,44 @@
 import * as yup from 'yup'
-import { useFormik } from 'formik'
+import { useFormik, Field, ErrorMessage} from 'formik'
 import { axiosAPI } from '../api/axiosAPI'
 import { toast } from 'react-toastify'
 import Select from 'react-select'
-import { GoogleLogin } from '@react-oauth/google'
+import { useState } from 'react'
 export default function Signup() {
     const options = [
-        { value: "Admin", label: "Admin" },
-        { value: "CEO", label: "CEO" },
+        { value: "Company", label: "Company" },
+        { value: "Super User", label: "Super User" },
+        { value: "Normal User", label: "Normal User" },
         { value: "Manager", label: "Manager" }]
+    const [company, setcompany] = useState(false)
     const Values = {
         firstName: '',
         MiddleName: '',
         lastName: '',
+        companyName: '',
+        city: '',
+        postCode: '',
+        region: '',
+        street: '',
+        category:'',
         Email: '',
         Password: '',
         passwordConfirmation: '',
         phone_number: '',
-        role: 'Admin'
+        role: 'Company'
     }
     const SignupSchema = yup.object().shape({
         firstName: yup.string()
-            .min(5)
-            .max(20)
             .required('First Name is Required'),
         MiddleName: yup.string()
-            .min(2)
-            .max(20)
             .notRequired(),
         lastName: yup.string()
-            .min(5)
-            .max(20)
             .required('Last Name is Required'),
-        Email: yup.string().email().required(),
+        Email: yup.string().email().required('Email is Required'),
         Password: yup.string().matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]$/,
             'Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character')
-            .min(5)
-            .max(10)
+            .min(5, 'Too short')
+            .max(10, 'Too long')
             .required('Password is Required'),
         passwordConfirmation: yup.string()
             .oneOf([yup.ref('Password')], 'Passwords must Match')
@@ -62,35 +64,68 @@ export default function Signup() {
                 <div className="bg-white px-6 py-8 rounded shadow-md text-black w-full">
                     <form onSubmit={formik.handleSubmit}>
                         <h1 className="mb-8 text-3xl text-center font-extrabold">Inscrivez-Vous</h1>
-                        <input
+                        {!company && <><Field
                             type="text"
                             className="block border border-grey-light w-full p-3 rounded mb-4"
                             name="firstName"
                             placeholder="Prénom" onChange={formik.handleChange} value={formik.values.firstName} />
+                            <ErrorMessage name="firstName"/>
 
-                        <input
+                        <Field
                             type="text"
                             className="block border border-grey-light w-full p-3 rounded mb-4"
                             name="lastName"
                             placeholder="Nom " onChange={formik.handleChange} value={formik.values.lastName} />
-
-                        <input
+                            <ErrorMessage name="lastName"/>
+                        </>}
+                        {
+                            company && <>
+                            <Field type='text' className="block border border-grey-light w-full p-3 rounded mb-4"
+                            name="companyName"
+                            placeholder="Nom d'entreprise" onChange={formik.handleChange} value={formik.values.companyName} />
+                            <ErrorMessage name="companyName"/>
+                            <div className=' flex flex-row gap-5'>
+                            <Field type='text' className="block border border-grey-light w-full p-3 rounded mb-4"
+                            name="city"
+                            placeholder="Ville" onChange={formik.handleChange} value={formik.values.city} />
+                            <ErrorMessage name="city"/>
+                            <Field type='text' className="block border border-grey-light w-full p-3 rounded mb-4"
+                            name="postcode"
+                            placeholder="Code Postale" onChange={formik.handleChange} value={formik.values.postCode} />
+                            <ErrorMessage name="postCode"/>
+                            <Field type='text' className="block border border-grey-light w-full p-3 rounded mb-4"
+                            name="region"
+                            placeholder="Region" onChange={formik.handleChange} value={formik.values.region} />
+                            <ErrorMessage name="region"/>
+                            </div>
+                            <Field type='text' className="block border border-grey-light w-full p-3 rounded mb-4"
+                            name="street"
+                            placeholder="Avenue" onChange={formik.handleChange} value={formik.values.street} />
+                            <ErrorMessage name="street"/>
+                            </>
+                        }
+                        <Field
                             type="email"
                             className="block border border-grey-light w-full p-3 rounded mb-4"
                             name="Email"
                             placeholder="Adresse E-mail" onChange={formik.handleChange} value={formik.values.Email} />
-                        <input
+                            <ErrorMessage name="Email"/>
+                        <Field
                             type="password"
                             className="block border border-grey-light w-full p-3 rounded mb-4"
                             name="Password"
                             placeholder="Mot de Passe" onChange={formik.handleChange} value={formik.values.Password} />
-                        <input
+                            <ErrorMessage name="Password"/>
+                        <Field
                             type="password"
                             className="block border border-grey-light w-full p-3 rounded mb-4"
                             name="passwordConfirmation"
                             placeholder="Mot de Passe Confirmation" onChange={formik.handleChange} value={formik.values.passwordConfirmation} />
-                        <Select options={options}></Select>
-                        <GoogleLogin onSuccess={() => alert('success')} onError={() => alert('failrue')}></GoogleLogin>
+                            <ErrorMessage name="passwordConfirmation"/>
+                        <Select options={options} onChange={(e)=>{
+                            e?.label=='Company' ? setcompany(true) : setcompany(false)
+                            formik.handleChange
+                            }}></Select>
                         <input className="w-full text-center py-3 rounded bg-green bg-blue-600 text-white font-bold hover:bg-green-dark focus:outline-none my-1" type='submit' value="Créez"></input>
                     </form>
                 </div>
