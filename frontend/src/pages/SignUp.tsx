@@ -1,5 +1,5 @@
 import * as yup from 'yup'
-import { useFormik, Field, ErrorMessage} from 'formik'
+import { Formik,Field, ErrorMessage} from 'formik'
 import { axiosAPI } from '../api/axiosAPI'
 import { toast } from 'react-toastify'
 import Select from 'react-select'
@@ -27,6 +27,14 @@ export default function Signup() {
         phone_number: '',
         role: 'Company'
     }
+    const handleSubmit = async()=>{
+        try {
+            await axiosAPI.post('accounts/postAccount', Values)
+            toast(`Account with has been created`)
+        } catch (error) {
+            toast(`Could not Create Account due to ${error}`)
+        }
+    }
     const SignupSchema = yup.object().shape({
         firstName: yup.string()
             .required('First Name is Required'),
@@ -46,61 +54,49 @@ export default function Signup() {
         phone_number: yup.string(),
         role: yup.string(),
     })
-    const formik = useFormik({
-        initialValues: Values,
-        onSubmit: async () => {
-            try {
-                await axiosAPI.post('accounts/postAccount', Values)
-                toast(`Account with email ${Values.Email} has been created`)
-            } catch (error) {
-                toast(`Could not Create Account due to ${error}`)
-            }
-        },
-        validationSchema: SignupSchema
-    })
     return <>
         <div className="bg-grey-lighter min-h-screen flex flex-col">
             <div className="container max-w-sm mx-auto flex-1 flex flex-col items-center justify-center px-2">
                 <div className="bg-white px-6 py-8 rounded shadow-md text-black w-full">
-                    <form onSubmit={formik.handleSubmit}>
+                    <Formik onSubmit={handleSubmit} initialValues={Values} validationSchema={SignupSchema}>
                         <h1 className="mb-8 text-3xl text-center font-extrabold">Inscrivez-Vous</h1>
                         {!company && <><Field
                             type="text"
                             className="block border border-grey-light w-full p-3 rounded mb-4"
                             name="firstName"
-                            placeholder="Prénom" onChange={formik.handleChange} value={formik.values.firstName} />
+                            placeholder="Prénom" />
                             <ErrorMessage name="firstName"/>
 
                         <Field
                             type="text"
                             className="block border border-grey-light w-full p-3 rounded mb-4"
                             name="lastName"
-                            placeholder="Nom " onChange={formik.handleChange} value={formik.values.lastName} />
+                            placeholder="Nom " />
                             <ErrorMessage name="lastName"/>
                         </>}
                         {
                             company && <>
                             <Field type='text' className="block border border-grey-light w-full p-3 rounded mb-4"
                             name="companyName"
-                            placeholder="Nom d'entreprise" onChange={formik.handleChange} value={formik.values.companyName} />
+                            placeholder="Nom d'entreprise"  />
                             <ErrorMessage name="companyName"/>
                             <div className=' flex flex-row gap-5'>
                             <Field type='text' className="block border border-grey-light w-full p-3 rounded mb-4"
                             name="city"
-                            placeholder="Ville" onChange={formik.handleChange} value={formik.values.city} />
+                            placeholder="Ville"/>
                             <ErrorMessage name="city"/>
                             <Field type='text' className="block border border-grey-light w-full p-3 rounded mb-4"
                             name="postcode"
-                            placeholder="Code Postale" onChange={formik.handleChange} value={formik.values.postCode} />
+                            placeholder="Code Postale"/>
                             <ErrorMessage name="postCode"/>
                             <Field type='text' className="block border border-grey-light w-full p-3 rounded mb-4"
                             name="region"
-                            placeholder="Region" onChange={formik.handleChange} value={formik.values.region} />
+                            placeholder="Region"/>
                             <ErrorMessage name="region"/>
                             </div>
                             <Field type='text' className="block border border-grey-light w-full p-3 rounded mb-4"
                             name="street"
-                            placeholder="Avenue" onChange={formik.handleChange} value={formik.values.street} />
+                            placeholder="Avenue"/>
                             <ErrorMessage name="street"/>
                             </>
                         }
@@ -108,26 +104,25 @@ export default function Signup() {
                             type="email"
                             className="block border border-grey-light w-full p-3 rounded mb-4"
                             name="Email"
-                            placeholder="Adresse E-mail" onChange={formik.handleChange} value={formik.values.Email} />
+                            placeholder="Adresse E-mail" />
                             <ErrorMessage name="Email"/>
                         <Field
                             type="password"
                             className="block border border-grey-light w-full p-3 rounded mb-4"
                             name="Password"
-                            placeholder="Mot de Passe" onChange={formik.handleChange} value={formik.values.Password} />
+                            placeholder="Mot de Passe" />
                             <ErrorMessage name="Password"/>
                         <Field
                             type="password"
                             className="block border border-grey-light w-full p-3 rounded mb-4"
                             name="passwordConfirmation"
-                            placeholder="Mot de Passe Confirmation" onChange={formik.handleChange} value={formik.values.passwordConfirmation} />
+                            placeholder="Mot de Passe Confirmation" />
                             <ErrorMessage name="passwordConfirmation"/>
                         <Select options={options} onChange={(e)=>{
                             e?.label=='Company' ? setcompany(true) : setcompany(false)
-                            formik.handleChange
                             }}></Select>
                         <input className="w-full text-center py-3 rounded bg-green bg-blue-600 text-white font-bold hover:bg-green-dark focus:outline-none my-1" type='submit' value="Créez"></input>
-                    </form>
+                    </Formik>
                 </div>
                 <div className="text-grey-dark mt-6">
                     Already have an account?
